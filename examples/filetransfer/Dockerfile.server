@@ -1,4 +1,4 @@
-# Copyright 2019 Carlos O'Ryan
+# Copyright 2025 Roberto Rodriguez
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License. You may obtain a copy of
@@ -14,7 +14,7 @@
 
 ARG DISTRO_VERSION=latest
 FROM grpc-cpp-devtools:${DISTRO_VERSION} AS build
-LABEL Maintainer="Carlos O'Ryan <coryan@users.noreply.github.com>"
+LABEL Maintainer="Roberto Rodriguez <robec1982@users.noreply.github.com>"
 
 # Copy the project source code into the intermediate 'build' image.
 COPY . /w
@@ -34,13 +34,14 @@ RUN cmake -H. -B.build \
 
 # Compile the project
 RUN cmake --build .build
-RUN strip .build/examples/echo/echo_server .build/examples/echo/echo_client
+# RUN strip .build/examples/filetransfer/filetransfer_server .build/examples/filetransfer/filetransfer_client
+RUN strip .build/examples/filetransfer/filetransfer_server
 
 FROM alpine:latest
 COPY --from=build \
-    /w/.build/examples/echo/echo_server \
-    /w/.build/examples/echo/echo_client \
+    /w/.build/examples/filetransfer/filetransfer_server \
+    # /w/.build/examples/filetransfer/filetransfer_client \
     /r/
 
-EXPOSE 7000
-CMD "/r/echo_server"
+EXPOSE 50051
+CMD "/r/filetransfer_server"

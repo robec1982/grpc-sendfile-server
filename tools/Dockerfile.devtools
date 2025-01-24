@@ -17,7 +17,7 @@
 
 ARG DISTRO_VERSION=edge
 FROM alpine:${DISTRO_VERSION} AS devtools
-MAINTAINER "Carlos O'Ryan <coryan@users.noreply.github.com>"
+LABEL MAintainer="Carlos O'Ryan <coryan@users.noreply.github.com>"
 
 # Install the typical development tools and some additions:
 #   - curl, perl, unzip and tar are needed by vcpkg to compile dependencies,
@@ -28,6 +28,7 @@ MAINTAINER "Carlos O'Ryan <coryan@users.noreply.github.com>"
 #
 RUN apk update && \
     apk add \
+        bash \
         boost-dev \
         boost-static \
         build-base \

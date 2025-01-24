@@ -19,9 +19,10 @@ set(PACKAGE_BUGREPORT "https://github.com/coryan/docker-grpc-cpp/issues")
 project(Docker-gRPC-C++ CXX C)
 
 # Configure the Compiler options, we will be using C++17 features.
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 add_subdirectory(examples/echo)
+add_subdirectory(examples/filetransfer)
