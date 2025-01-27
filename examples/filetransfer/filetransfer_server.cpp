@@ -18,6 +18,8 @@
 #include <functional>
 #include <iostream>
 #include <fstream>
+#include <thread>
+#include <memory>
 
 class FileTransferServiceImpl final : public filetransfer::FileTransfer::Service {
 public:
@@ -26,7 +28,10 @@ public:
                           filetransfer::UploadStatus* response) override {
     filetransfer::FileChunk chunk;
     std::ofstream output_file;
-
+    std::string filename;
+    
+    // Read the file chunks from the client
+    std::cout << "Uploading file..." << std::endl;
     while (reader->Read(&chunk)) {
       if (!output_file.is_open()) {
         // Open the file for writing the first time
@@ -35,6 +40,10 @@ public:
           response->set_success(false);
           response->set_message("Failed to open file: " + chunk.filename());
           return grpc::Status::OK;
+        }
+        else if (filename == "") {
+          filename = chunk.filename();
+          std::cout << "Began writing file " + filename + "..." << std::endl;
         }
       }
 
@@ -45,7 +54,42 @@ public:
     output_file.close();
     response->set_success(true);
     response->set_message("File uploaded successfully.");
+    std::cout << "File uploaded: " + filename << std::endl;
     return grpc::Status::OK;
+  }
+
+  // DownloadFile implementation
+  grpc::Status DownloadFile(grpc::ServerContext* context,
+                            const filetransfer::FileChunk* request,
+                            grpc::ServerWriter<filetransfer::FileChunk>* writer) override {
+      const std::string filename = request->filename();
+      std::ifstream input_file(filename, std::ios::binary | std::ios::in);
+
+      // Check if the file can be opened
+      if (!input_file) {
+          return grpc::Status(grpc::StatusCode::NOT_FOUND, "File not found: " + filename);
+      }
+      else {
+          std::cout << "File found: " << filename << " enqueued in download stream..." << std::endl;
+      }
+
+      // Use a heap-allocated buffer to avoid stack overflow
+      const size_t buffer_size = 64 * 1024; // 64 KB
+      std::unique_ptr<char[]> buffer(new char[buffer_size]);
+      filetransfer::FileChunk chunk;
+
+      // Read file in chunks and send to the client
+      while (input_file.read(buffer.get(), buffer_size) || input_file.gcount() > 0) {
+          chunk.set_filename(filename);
+          chunk.set_content(buffer.get(), input_file.gcount());
+          if (!writer->Write(chunk)) {
+              return grpc::Status(grpc::StatusCode::UNKNOWN, "Failed to write chunk to client.");
+          }
+      }
+
+      input_file.close();
+      std::cout << "File download completed: " << filename << std::endl;
+      return grpc::Status::OK;
   }
 };
 
@@ -64,6 +108,11 @@ void RunServer() {
 }
 
 int main(int argc, char** argv) {
-  RunServer();
+  try {
+    RunServer();
+  } catch (std::exception const& ex) {
+    std::cerr << "Server exception caught: " << ex.what() << std::endl;
+    return 1;
+  }
   return 0;
 }

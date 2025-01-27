@@ -4,6 +4,7 @@ package filetransfer;
 
 service FileTransfer {
   rpc UploadFile(stream FileChunk) returns (UploadStatus);
+  rpc DownloadFile(FileChunk) returns (stream FileChunk);
 }
 
 message FileChunk {
