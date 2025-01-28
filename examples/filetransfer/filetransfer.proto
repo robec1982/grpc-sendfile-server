@@ -4,7 +4,12 @@ package filetransfer;
 
 service FileTransfer {
   rpc UploadFile(stream FileChunk) returns (UploadStatus);
-  rpc DownloadFile(FileChunk) returns (stream FileChunk);
+  rpc DownloadFile(FileProperties) returns (stream FileChunk);
+}
+
+message FileProperties {
+  string filename = 1;
+  int64 blocksize = 2;
 }
 
 message FileChunk {

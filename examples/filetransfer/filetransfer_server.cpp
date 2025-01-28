@@ -60,23 +60,23 @@ public:
 
   // DownloadFile implementation
   grpc::Status DownloadFile(grpc::ServerContext* context,
-                            const filetransfer::FileChunk* request,
+                            const filetransfer::FileProperties* request,
                             grpc::ServerWriter<filetransfer::FileChunk>* writer) override {
       const std::string filename = request->filename();
+      const std::int64_t blocksize = request->blocksize();
       std::ifstream input_file(filename, std::ios::binary | std::ios::in);
 
       // Check if the file can be opened
       if (!input_file) {
           return grpc::Status(grpc::StatusCode::NOT_FOUND, "File not found: " + filename);
       }
-      else {
-          std::cout << "File found: " << filename << " enqueued in download stream..." << std::endl;
-      }
-
+      
       // Use a heap-allocated buffer to avoid stack overflow
-      const size_t buffer_size = 64 * 1024; // 64 KB
+      const size_t buffer_size = blocksize * 1024; // blocksize KB
       std::unique_ptr<char[]> buffer(new char[buffer_size]);
       filetransfer::FileChunk chunk;
+
+      std::cout << "File found: " << filename << " enqueued in download stream (" << blocksize << "KB block_size)..." << std::endl;
 
       // Read file in chunks and send to the client
       while (input_file.read(buffer.get(), buffer_size) || input_file.gcount() > 0) {
