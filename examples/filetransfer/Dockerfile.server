@@ -38,6 +38,11 @@ RUN cmake --build .build
 RUN strip .build/examples/filetransfer/filetransfer_server
 
 FROM alpine:latest
+
+VOLUME ["/app/files"]
+RUN mkdir -p /app/files
+COPY ./files /app/files/
+
 COPY --from=build \
     /w/.build/examples/filetransfer/filetransfer_server \
     # /w/.build/examples/filetransfer/filetransfer_client \

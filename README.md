@@ -23,7 +23,7 @@ compile the gRPC server. While it is possible to install all these development
 tools in your workstation, a Docker image makes the remaining steps easier to
 reproduce.
 
-This step may take a few minutes, as it builds gRPC and other dependencies:
+This step may take a few minutes, even a couple of hours, as it builds gRPC and other dependencies. For reference, it took 1h:50m to build the image while running in a development laptop configured with a Core i5 8th Gen processor and 16GB of RAM.
 
 ```bash
 sudo docker build -t grpc-cpp-devtools:latest -f tools/Dockerfile.devtools tools
@@ -38,7 +38,15 @@ image with a C++ gRPC server:
 sudo docker build -t grpc-cpp-echo:latest -f examples/echo/Dockerfile.server .
 ```
 
-Note that this image is relatively small:
+Note that this image is created for the echo example. Besides, you can easily build images for other examples you place into the `examples` directory by using the same naming pattern of the **echo** example. For instance, we have built another, **filetransfer** example whose server you can built with the command below:
+
+```bash
+sudo docker build -t grpc-cpp-filetransfer:latest -f examples/filetransfer/Dockerfile.server .
+```
+
+However, we continue only by building the **echo** example image to keep it simple.
+
+Note also that the images are relatively small:
 
 ```bash
 sudo docker image ls grpc-cpp-echo:latest

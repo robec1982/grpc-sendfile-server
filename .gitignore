@@ -40,3 +40,6 @@ cmake-build-release/
 
 # Manual binary output directory
 .build/
+
+# Ignore files inside the example files directory
+files/*
