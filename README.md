@@ -69,7 +69,7 @@ ID=$(sudo docker run -d -P grpc-cpp-echo:latest /r/echo_server)
 
 ### Using bind mounts
 
-Note that the `filetransfer` example might use the `files` folder in the root of the project as a bind mount directory. This uses a synchronized (two-way directory) that you can run as below in **Windows PowerShell**:
+Note that the `filetransfer` example might use the `files` folder in the root of the project as a bind mount directory. This uses a synchronized (two-ways directory) that you can run as below in **Windows PowerShell**:
 
 ```powershell
 docker run -d -P -v "${PWD}\files:/app/files" grpc-cpp-filetransfer:latest /r/filetransfer_server
